@@ -1,0 +1,29 @@
+version: "3.3"
+
+services:
+  db:
+    image: docker.io/library/postgres:14.2-alpine
+    ports:
+     - "5432:5432"
+    volumes:
+            #      - ./data/db:/var/lib/postgresql/data:z
+      - /storage/medseerdb:/var/lib/postgresql/data:z
+    environment:
+      - PGUSER=postgres
+      - POSTGRES_NAME=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  nginx:
+    image: docker.io/library/nginx:1.21.6-alpine
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:z
+      - ./website/staticfiles:/home/app/web/staticfiles:z
+      - ./website/mediafiles/xmls:/home/app/web/mediafiles/xmls:z
+      - ./website/mediafiles/pdfs:/home/app/web/mediafiles/pdfs:z
+    ports:
+      - 8880:80
